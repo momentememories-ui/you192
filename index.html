@@ -8,7 +8,6 @@
     <style>
         body {
             margin: 0; padding: 0;
-            /* แก้ไข: ใช้ไฟล์ photo11.jpg ล็อกพื้นหลังห้ามขยับ ห้ามเลื่อนแน่นหนา */
             background-image: url('photo11.jpg');
             background-repeat: no-repeat;
             background-position: center center;
@@ -22,7 +21,6 @@
             position: relative;
         }
 
-        /* แก้ไข: อิโมจิลอยตอนเริ่มรดน้ำ ให้ลอยขึ้นมาตั้งแต่ต้น ไม่จอดนิ่งตรงกลาง และกระจายทั่วหน้าจอ */
         .butterfly {
             position: fixed; pointer-events: none; z-index: 1; font-size: 20px;
             animation: floatUpScreen 10s linear infinite; opacity: 0;
@@ -53,7 +51,6 @@
             transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* อนิเมชันสำหรับสั่นช่อดอกไม้เพื่อดึงดูดสายตา */
         @keyframes bouquetWobble {
             0% { transform: scale(1.15) rotate(0deg); }
             25% { transform: scale(1.18) rotate(-4deg); }
@@ -142,7 +139,6 @@
             transform-origin: center center;
         }
 
-        /* ปุ่มปิดแบบวงกลมสวยงาม */
         .close-btn {
             position: absolute;
             top: -12px;
@@ -166,7 +162,6 @@
             transform: scale(1.1);
         }
 
-        /* แก้ไข: อิโมจิตอนกดรูป/จดหมาย กระจายทั่วจอ ไม่รวมตรงกลาง และลอยช้าๆ สบายตา */
         .pop-emoji {
             position: fixed; pointer-events: none; z-index: 350; font-size: 24px;
             animation: floatUpEmoji 5s linear forwards; opacity: 0;
@@ -222,7 +217,6 @@
             }, { once: true });
         });
 
-        /* แก้ไข: ให้ผีเสื้อ/อิโมจิตอนเริ่มลอยกระจายทั่วทั้งหน้าจอ และเริ่มลอยทันที */
         function createButterflies() {
             const emojis = ['💗', '🌻'];
             for(let i=0; i<15; i++) {
@@ -240,7 +234,6 @@
 
         let count = 0;
         let isComplete = false;
-        let isBouquetStage = false;
         
         const captions = [
             "2 ปีละนะ\nขอบคุณนะคะที่มาเจอกันวันนั้น", 
@@ -262,7 +255,6 @@
         const nongImg = document.getElementById('nong-img');
         const plantContainer = document.getElementById('plant-container');
         const boxBtn = document.getElementById('box-btn');
-        const bgMusic = document.getElementById('bg-music');
 
         touchArea.addEventListener('pointerdown', (e) => {
             if (isComplete) return;
@@ -298,4 +290,66 @@
             } else {
                 waterCan.style.display = "block";
                 waterCan.style.left = (e.clientX - 40) + "px";
-                waterCan.style.top
+                waterCan.style.top = (e.clientY - 40) + "px";
+            }
+        });
+
+        nongImg.addEventListener('click', () => {
+            nongImg.style.display = 'none';
+            statusText.innerText = `ลองกดดูรูปความทรงจำของเราสิคะ 💕`;
+            
+            captions.forEach((cap, idx) => {
+                const seed = document.createElement('img');
+                seed.className = 'memory-seed';
+                seed.src = `photo${idx + 1}.jpg`;
+                
+                const angle = (idx / captions.length) * Math.PI * 2;
+                const radius = 110;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                plantContainer.appendChild(seed);
+                
+                setTimeout(() => {
+                    seed.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random() * 20 - 10}deg)`;
+                }, idx * 100);
+                
+                seed.onclick = () => openPhoto(`photo${idx + 1}.jpg`, cap);
+            });
+
+            setTimeout(() => {
+                boxBtn.style.display = 'block';
+                setTimeout(() => {
+                    boxBtn.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 10);
+            }, captions.length * 100 + 500);
+        });
+
+        function openPhoto(src, caption) {
+            const viewer = document.getElementById('photo-viewer');
+            document.getElementById('view-img').src = src;
+            document.getElementById('view-caption').innerText = caption;
+            viewer.style.display = 'flex';
+            setTimeout(() => viewer.style.backgroundColor = 'rgba(0,0,0,0.6)', 10);
+        }
+
+        function closePhoto() {
+            const viewer = document.getElementById('photo-viewer');
+            viewer.style.backgroundColor = 'rgba(0,0,0,0)';
+            setTimeout(() => viewer.style.display = 'none', 300);
+        }
+
+        function openNote(el) {
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.backgroundColor = 'rgba(0,0,0,0.7)', 10);
+        }
+
+        function closeNote() {
+            const overlay = document.getElementById('overlay');
+            overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+            setTimeout(() => overlay.style.display = 'none', 300);
+        }
+    </script>
+</body>
+</html>
