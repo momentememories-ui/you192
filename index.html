@@ -8,7 +8,6 @@
     <style>
         body {
             margin: 0; padding: 0;
-            /* แก้ไข: ใช้ไฟล์ photo11.jpg ล็อกพื้นหลังห้ามขยับ ห้ามเลื่อนแน่นหนา */
             background-image: url('photo11.jpg');
             background-repeat: no-repeat;
             background-position: center center;
@@ -22,7 +21,6 @@
             position: relative;
         }
 
-        /* แก้ไข: อิโมจิลอยตอนเริ่มรดน้ำ ให้ลอยขึ้นมาตั้งแต่ต้น ไม่จอดนิ่งตรงกลาง และกระจายทั่วหน้าจอ */
         .butterfly {
             position: fixed; pointer-events: none; z-index: 1; font-size: 20px;
             animation: floatUpScreen 10s linear infinite; opacity: 0;
@@ -53,7 +51,6 @@
             transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* อนิเมชันสำหรับสั่นช่อดอกไม้เพื่อดึงดูดสายตา */
         @keyframes bouquetWobble {
             0% { transform: scale(1.15) rotate(0deg); }
             25% { transform: scale(1.18) rotate(-4deg); }
@@ -133,13 +130,24 @@
             justify-content: center; align-items: center; z-index: 400;
             transition: background-color 0.5s ease;
         }
-        #note-img-display {
-            width: 95%; 
-            max-width: 450px; 
-            height: auto;
+
+        /* ปรับโครงสร้าง Wrapper ของซองจดหมายให้แสดงผลตรงกลางและทำอนิเมชันได้ถูกต้อง */
+        #note-wrapper {
             position: absolute;
+            width: 95%;
+            max-width: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             transform-origin: center center;
+        }
+
+        #note-img-display {
+            width: 100%; 
+            height: auto;
+            display: block;
+            border-radius: 8px;
         }
 
         /* ปุ่มปิดแบบวงกลมสวยงาม */
@@ -147,8 +155,8 @@
             position: absolute;
             top: -12px;
             right: -12px;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             background: #ff5c8d;
             color: white;
             border-radius: 50%;
@@ -158,7 +166,7 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
             z-index: 10;
             transition: transform 0.2s ease;
         }
@@ -166,7 +174,6 @@
             transform: scale(1.1);
         }
 
-        /* แก้ไข: อิโมจิตอนกดรูป/จดหมาย กระจายทั่วจอ ไม่รวมตรงกลาง และลอยช้าๆ สบายตา */
         .pop-emoji {
             position: fixed; pointer-events: none; z-index: 350; font-size: 24px;
             animation: floatUpEmoji 5s linear forwards; opacity: 0;
@@ -203,10 +210,11 @@
         </div>
     </div>
 
+    <!-- แก้ไขโครงสร้าง HTML ตรงนี้ เพื่อให้รูปจดหมายและปุ่มปิดแสดงผลได้ถูกต้อง -->
     <div id="overlay" onclick="closeNote()">
-        <div style="position: relative; display: inline-block;">
+        <div id="note-wrapper" onclick="event.stopPropagation()">
             <div class="close-btn" onclick="closeNote()">✕</div>
-            <img id="note-img-display" src="note.png" onclick="event.stopPropagation()">
+            <img id="note-img-display" src="note.png">
         </div>
     </div>
 
@@ -222,7 +230,6 @@
             }, { once: true });
         });
 
-        /* แก้ไข: ให้ผีเสื้อ/อิโมจิตอนเริ่มลอยกระจายทั่วทั้งหน้าจอ และเริ่มลอยทันที */
         function createButterflies() {
             const emojis = ['💗', '🌻'];
             for(let i=0; i<15; i++) {
@@ -311,7 +318,6 @@
                 plantImg.style.transform = "scale(0.3)"; 
                 plantImg.src = 'bouquet.png'; 
                 
-                /* แก้ไข: เมื่อเปลี่ยนเป็นช่อดอกไม้ ให้เริ่มสั่นดึงดูดสายตาทันที */
                 setTimeout(() => {
                     plantImg.classList.add('wobble-active');
                 }, 50);
@@ -325,7 +331,6 @@
                     plantImg.style.cursor = 'pointer';
                     plantImg.onclick = () => {
                         bgMusic.play().catch(e => console.log("Music play blocked"));
-                        /* แก้ไข: พอกดรูปเด้งออกมา ช่อดอกไม้จะหยุดสั่นทันที */
                         plantImg.classList.remove('wobble-active');
                         plantImg.style.transform = "scale(1.15) rotate(0deg)";
                         explode();
@@ -365,7 +370,6 @@
                 const finalX = pos.x + jitterX;
                 const finalY = pos.y + jitterY;
                 
-                /* แก้ไข: สุ่มมุมเอียงรูปภาพให้ดูมีความเป็นธรรมชาติติดเอียงเล็กน้อย ไม่อยู่ในระเบียบ */
                 const rotate = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 18);
 
                 setTimeout(() => {
@@ -393,7 +397,6 @@
         let currentOriginElement = null;
         let emojiInterval = null;
 
-        /* แก้ไข: อิโมจิตอนเปิดรูป/ข้อความ ให้ลอยกระจายทั่วหน้าจอ ไม่รวมตรงกลาง และลอยขึ้นมาช้าๆ */
         function startEmojiBurst() {
             const container = document.getElementById('photo-viewer').style.display === 'flex' ? 
                 document.getElementById('photo-viewer') : document.getElementById('overlay');
@@ -473,30 +476,31 @@
             }
         }
 
+        /* แก้ไขฟังก์ชัน openNote ให้ปรับแต่งอนิเมชันที่ตัว note-wrapper แทนเพื่อไม่ให้ตำแหน่งหลุด */
         function openNote(element) {
             currentOriginElement = element;
             const overlay = document.getElementById('overlay');
-            const noteDisplay = document.getElementById('note-img-display');
+            const noteWrapper = document.getElementById('note-wrapper');
             
             const rect = element.getBoundingClientRect();
             const startLeft = rect.left + (rect.width / 2);
             const startTop = rect.top + (rect.height / 2);
             
-            noteDisplay.style.transition = 'none';
-            noteDisplay.style.left = startLeft + 'px';
-            noteDisplay.style.top = startTop + 'px';
-            noteDisplay.style.transform = 'translate(-50%, -50%) scale(0.1)';
-            noteDisplay.style.opacity = '0';
+            noteWrapper.style.transition = 'none';
+            noteWrapper.style.left = startLeft + 'px';
+            noteWrapper.style.top = startTop + 'px';
+            noteWrapper.style.transform = 'translate(-50%, -50%) scale(0.1)';
+            noteWrapper.style.opacity = '0';
             
             overlay.style.display = 'flex';
             
             setTimeout(() => {
                 overlay.style.backgroundColor = 'rgba(0,0,0,0.9)';
-                noteDisplay.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                noteDisplay.style.left = '50%';
-                noteDisplay.style.top = '50%';
-                noteDisplay.style.transform = 'translate(-50%, -50%) scale(1)';
-                noteDisplay.style.opacity = '1';
+                noteWrapper.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                noteWrapper.style.left = '50%';
+                noteWrapper.style.top = '50%';
+                noteWrapper.style.transform = 'translate(-50%, -50%) scale(1)';
+                noteWrapper.style.opacity = '1';
                 startEmojiBurst();
             }, 20);
         }
@@ -504,7 +508,7 @@
         function closeNote() {
             stopEmojiBurst();
             const overlay = document.getElementById('overlay');
-            const noteDisplay = document.getElementById('note-img-display');
+            const noteWrapper = document.getElementById('note-wrapper');
             
             if (currentOriginElement) {
                 const rect = currentOriginElement.getBoundingClientRect();
@@ -512,10 +516,10 @@
                 const endTop = rect.top + (rect.height / 2);
                 
                 overlay.style.backgroundColor = 'rgba(0,0,0,0)';
-                noteDisplay.style.left = endLeft + 'px';
-                noteDisplay.style.top = endTop + 'px';
-                noteDisplay.style.transform = 'translate(-50%, -50%) scale(0.1)';
-                noteDisplay.style.opacity = '0';
+                noteWrapper.style.left = endLeft + 'px';
+                noteWrapper.style.top = endTop + 'px';
+                noteWrapper.style.transform = 'translate(-50%, -50%) scale(0.1)';
+                noteWrapper.style.opacity = '0';
                 
                 setTimeout(() => {
                     overlay.style.display = 'none';
