@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Anniversary💗</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            /* แก้ไข: ใช้ไฟล์ photo11.jpg ล็อกพื้นหลังห้ามขยับ ห้ามเลื่อนแน่นหนา */
+            background-image: url('photo11.jpg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            font-family: 'Prompt', sans-serif;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            position: relative;
+        }
+
+        /* แก้ไข: อิโมจิลอยตอนเริ่มรดน้ำ ให้ลอยขึ้นมาตั้งแต่ต้น ไม่จอดนิ่งตรงกลาง และกระจายทั่วหน้าจอ */
+        .butterfly {
+            position: fixed; pointer-events: none; z-index: 1; font-size: 20px;
+            animation: floatUpScreen 10s linear infinite; opacity: 0;
+        }
+        @keyframes floatUpScreen {
+            0% { transform: translateY(105vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.9; }
+            90% { opacity: 0.9; }
+            100% { transform: translateY(-10vh) translateX(var(--x-swing)) rotate(360deg); opacity: 0; }
+        }
+
+        #status-text { 
+            color: #5d4037; font-size: 1rem; margin-bottom: 20px; 
+            z-index: 10; text-align: center; width: 85%;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            font-weight: 600;
+        }
+
+        #plant-container {
+            width: 280px; height: 380px;
+            display: flex; justify-content: center; align-items: flex-end;
+            position: relative; z-index: 5; 
+        }
+
+        #main-plant-img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* อนิเมชันสำหรับสั่นช่อดอกไม้เพื่อดึงดูดสายตา */
+        @keyframes bouquetWobble {
+            0% { transform: scale(1.15) rotate(0deg); }
+            25% { transform: scale(1.18) rotate(-4deg); }
+            50% { transform: scale(1.15) rotate(4deg); }
+            75% { transform: scale(1.18) rotate(-3deg); }
+            100% { transform: scale(1.15) rotate(0deg); }
+        }
+        .wobble-active {
+            animation: bouquetWobble 1.2s ease-in-out infinite !important;
+        }
+
+        #nong-img {
+            position: absolute; 
+            bottom: 55%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 80px; height: auto;
+            cursor: pointer; z-index: 15; opacity: 0;
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #nong-img.show { 
+            opacity: 1;
+            transform: translate(60px, -60px) scale(1);
+            animation: floatingNong 2s ease-in-out infinite alternate;
+        }
+        @keyframes floatingNong {
+            from { transform: translate(60px, -60px) scale(1); }
+            to { transform: translate(65px, -75px) scale(1.05); }
+        }
+
+        .memory-seed {
+            position: absolute;
+            width: 50px; height: 50px; 
+            padding: 3px; background: white;
+            border: 1px solid #eee;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+            top: 50%; left: 50%;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.6s, top 0.6s;
+            z-index: 60; 
+            cursor: pointer; pointer-events: auto;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        #photo-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0); display: none;
+            justify-content: center; align-items: center; z-index: 300;
+            transition: background-color 0.5s ease;
+        }
+        .view-card {
+            width: 75%; max-width: 260px;
+            background: white; padding: 10px 10px 20px 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: absolute;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-origin: center center;
+            border-radius: 6px;
+        }
+        .view-card img { width: 100%; height: auto; display: block; margin-bottom: 12px; border-radius: 2px; }
+        .view-caption { text-align: center; color: #444; font-size: 0.85rem; font-weight: 600; }
+
+        #touch-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 6; cursor: pointer; }
+        #watering-can-img { position: fixed; width: 80px; height: 80px; pointer-events: none; display: none; z-index: 100; transform: rotate(-20deg); }
+
+        #box-btn {
+            position: absolute; top: 50%; left: 50%; 
+            width: 85px; height: auto; 
+            z-index: 100; cursor: pointer; 
+            transform: translate(-50%, -50%) scale(0);
+            transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 1s, top 1s;
+            display: none;
+        }
+
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0); display: none;
+            justify-content: center; align-items: center; z-index: 400;
+            transition: background-color 0.5s ease;
+        }
+        #note-img-display {
+            width: 95%; 
+            max-width: 450px; 
+            height: auto;
+            position: absolute;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-origin: center center;
+        }
+
+        /* ปุ่มปิดแบบวงกลมสวยงาม */
+        .close-btn {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            width: 30px;
+            height: 30px;
+            background: #ff5c8d;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s ease;
+        }
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* แก้ไข: อิโมจิตอนกดรูป/จดหมาย กระจายทั่วจอ ไม่รวมตรงกลาง และลอยช้าๆ สบายตา */
+        .pop-emoji {
+            position: fixed; pointer-events: none; z-index: 350; font-size: 24px;
+            animation: floatUpEmoji 5s linear forwards; opacity: 0;
+        }
+        @keyframes floatUpEmoji {
+            0% { transform: translateY(105vh) translateX(0) scale(0.6); opacity: 0; }
+            15% { opacity: 0.85; }
+            85% { opacity: 0.85; }
+            100% { transform: translateY(-10vh) translateX(var(--x-move)) scale(1.1); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" src="song.mp3" loop autoplay></audio>
+
+    <h1 id="status-text">ที่รักช่วยรดน้ำต้นไม้ต้นนี้ให้หน่อยนะ🌱</h1>
+
+    <div id="plant-container">
+        <img id="main-plant-img" src="stage1.png">
+        <img id="nong-img" src="nong.png">
+    </div>
+
+    <div id="touch-area"></div>
+    <img id="watering-can-img" src="water-can.png">
+
+    <img id="box-btn" src="box.png" onclick="openNote(this)">
+
+    <div id="photo-viewer" onclick="closePhoto()">
+        <div id="active-view-card" class="view-card" onclick="event.stopPropagation()">
+            <div class="close-btn" onclick="closePhoto()">✕</div>
+            <img id="view-img" src="">
+            <div id="view-caption" class="view-caption"></div>
+        </div>
+    </div>
+
+    <div id="overlay" onclick="closeNote()">
+        <div style="position: relative; display: inline-block;">
+            <div class="close-btn" onclick="closeNote()">✕</div>
+            <img id="note-img-display" src="note.png" onclick="event.stopPropagation()">
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const music = document.getElementById('bg-music');
+            music.play().catch(e => {
+                console.log("Autoplay บล็อกชั่วคราว รอการสัมผัสแรกจากผู้ใช้เพื่อความปลอดภัยของระบบเสียงเบราว์เซอร์");
+            });
+            
+            document.body.addEventListener('pointerdown', () => {
+                if (music.paused) music.play().catch(e => console.log(e));
+            }, { once: true });
+        });
+
+        /* แก้ไข: ให้ผีเสื้อ/อิโมจิตอนเริ่มลอยกระจายทั่วทั้งหน้าจอ และเริ่มลอยทันที */
+        function createButterflies() {
+            const emojis = ['💗', '🌻'];
+            for(let i=0; i<15; i++) {
+                const b = document.createElement('div');
+                b.className = 'butterfly';
+                b.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                b.style.left = (Math.random() * 90 + 5) + 'vw';
+                b.style.setProperty('--x-swing', ((Math.random() - 0.5) * 120) + 'px');
+                b.style.animationDelay = (Math.random() * 8) + 's';
+                b.style.animationDuration = (8 + Math.random() * 6) + 's';
+                document.body.appendChild(b);
+            }
+        }
+        createButterflies();
+
+        let count = 0;
+        let isComplete = false;
+        let isBouquetStage = false;
+        
+        const captions = [
+            "2 ปีละนะ\nขอบคุณนะคะที่มาเจอกันวันนั้น", 
+            "อยากรู้จังวันนั้น\nอธิษฐานอะไรน้าาา??", 
+            "แล้วก็เจอกันอย่างต่อเนื่อง", 
+            "หลากหลาย Moment", 
+            "หลายๆ Emotion", 
+            "ขอบคุณที่คอยเป็นคนหลังกล้อง", 
+            "เป็นคนขับรถส่วนตัว", 
+            "ทะเลาะกันพอเป็นสีสันแหละเนอะ", 
+            "รักแหละดูออก555", 
+            "รักแบบนี้ไปนานๆๆเลยน้าาา\nที่รักของเค้า"
+        ];
+
+        const statusText = document.getElementById('status-text');
+        const plantImg = document.getElementById('main-plant-img');
+        const waterCan = document.getElementById('watering-can-img');
+        const touchArea = document.getElementById('touch-area');
+        const nongImg = document.getElementById('nong-img');
+        const plantContainer = document.getElementById('plant-container');
+        const boxBtn = document.getElementById('box-btn');
+        const bgMusic = document.getElementById('bg-music');
+
+        touchArea.addEventListener('pointerdown', (e) => {
+            if (isComplete) return;
+            count++;
+            
+            if (count <= 20) {
+                statusText.innerText = `เย้! ได้รับน้ำจากที่รักแล้วเริ่มโตเลย (${count}%)`;
+            } else if (count <= 40) {
+                statusText.innerText = `ขอบคุณที่ตั้งใจเลี้ยงดูแลอย่างดีนะ (${count}%)`;
+            } else if (count <= 60) {
+                statusText.innerText = `ต้นไม้ของเรากำลังเติบโตด้วยความรักแล้วนะ (${count}%)`;
+            } else if (count <= 80) {
+                statusText.innerText = `อีกนิดเดียวต้นไม้ของเราจะสมบูรณ์แบบแล้วนะ (${count}%)`;
+            } else {
+                statusText.innerText = `อีกนิดนะ ต้นไม้ของเราเติบโตเต็มที่แล้ว (${count}%)`;
+            }
+            
+            if(count === 20) plantImg.src = 'stage2.png';
+            if(count === 40) plantImg.src = 'stage3.png';
+            if(count === 60) plantImg.src = 'stage4.png';
+            if(count === 80) plantImg.src = 'stage5.png';
+            
+            if(count >= 100) {
+                plantImg.src = 'stage6.png';
+                isComplete = true;
+                waterCan.remove();
+                touchArea.remove();
+                
+                setTimeout(() => { 
+                    nongImg.classList.add('show'); 
+                    statusText.innerText = `มาเก็บเกี่ยวกัน...ลองกดดูสิ?`; 
+                }, 800);
+            } else {
+                waterCan.style.display = "block";
+                waterCan.style.left = (e.clientX - 40) + "px";
+                waterCan.style.top
