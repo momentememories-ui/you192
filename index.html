@@ -8,6 +8,7 @@
     <style>
         body {
             margin: 0; padding: 0;
+            /* แก้ไข: ใช้ไฟล์ photo11.jpg ล็อกพื้นหลังห้ามขยับ ห้ามเลื่อนแน่นหนา */
             background-image: url('photo11.jpg');
             background-repeat: no-repeat;
             background-position: center center;
@@ -21,6 +22,7 @@
             position: relative;
         }
 
+        /* แก้ไข: อิโมจิลอยตอนเริ่มรดน้ำ ให้ลอยขึ้นมาตั้งแต่ต้น ไม่จอดนิ่งตรงกลาง และกระจายทั่วหน้าจอ */
         .butterfly {
             position: fixed; pointer-events: none; z-index: 1; font-size: 20px;
             animation: floatUpScreen 10s linear infinite; opacity: 0;
@@ -51,6 +53,7 @@
             transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        /* อนิเมชันสำหรับสั่นช่อดอกไม้เพื่อดึงดูดสายตา */
         @keyframes bouquetWobble {
             0% { transform: scale(1.15) rotate(0deg); }
             25% { transform: scale(1.18) rotate(-4deg); }
@@ -139,6 +142,7 @@
             transform-origin: center center;
         }
 
+        /* ปุ่มปิดแบบวงกลมสวยงาม */
         .close-btn {
             position: absolute;
             top: -12px;
@@ -162,6 +166,7 @@
             transform: scale(1.1);
         }
 
+        /* แก้ไข: อิโมจิตอนกดรูป/จดหมาย กระจายทั่วจอ ไม่รวมตรงกลาง และลอยช้าๆ สบายตา */
         .pop-emoji {
             position: fixed; pointer-events: none; z-index: 350; font-size: 24px;
             animation: floatUpEmoji 5s linear forwards; opacity: 0;
@@ -178,7 +183,7 @@
 
     <audio id="bg-music" src="song.mp3" loop autoplay></audio>
 
-    <h1 id="status-text">ที่รักช่วยรดน้ำต้นไม้ต้นนี้ให้หน่อยนะ🌱</h1>
+    <h1 id="status-text">ที่รักช่วยรดน้ำให้ต้นไม้ต้นนี้หน่อยนะ🌱</h1>
 
     <div id="plant-container">
         <img id="main-plant-img" src="stage1.png">
@@ -217,6 +222,7 @@
             }, { once: true });
         });
 
+        /* แก้ไข: ให้ผีเสื้อ/อิโมจิตอนเริ่มลอยกระจายทั่วทั้งหน้าจอ และเริ่มลอยทันที */
         function createButterflies() {
             const emojis = ['💗', '🌻'];
             for(let i=0; i<15; i++) {
@@ -234,6 +240,7 @@
 
         let count = 0;
         let isComplete = false;
+        let isBouquetStage = false;
         
         const captions = [
             "2 ปีละนะ\nขอบคุณนะคะที่มาเจอกันวันนั้น", 
@@ -255,6 +262,7 @@
         const nongImg = document.getElementById('nong-img');
         const plantContainer = document.getElementById('plant-container');
         const boxBtn = document.getElementById('box-btn');
+        const bgMusic = document.getElementById('bg-music');
 
         touchArea.addEventListener('pointerdown', (e) => {
             if (isComplete) return;
@@ -291,64 +299,230 @@
                 waterCan.style.display = "block";
                 waterCan.style.left = (e.clientX - 40) + "px";
                 waterCan.style.top = (e.clientY - 40) + "px";
+                plantImg.style.transform = "scale(1.05)";
+                setTimeout(() => plantImg.style.transform = "scale(1)", 50);
             }
         });
 
-        nongImg.addEventListener('click', () => {
-            nongImg.style.display = 'none';
-            statusText.innerText = `ลองกดดูรูปความทรงจำของเราสิคะ 💕`;
-            
-            captions.forEach((cap, idx) => {
-                const seed = document.createElement('img');
-                seed.className = 'memory-seed';
-                seed.src = `photo${idx + 1}.jpg`;
+        touchArea.addEventListener('pointerup', () => { if(waterCan) waterCan.style.display = "none"; });
+
+        nongImg.onclick = () => {
+            if (!isBouquetStage) {
+                plantImg.style.transform = "scale(0.3)"; 
+                plantImg.src = 'bouquet.png'; 
                 
-                const angle = (idx / captions.length) * Math.PI * 2;
-                const radius = 110;
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-                
-                plantContainer.appendChild(seed);
+                /* แก้ไข: เมื่อเปลี่ยนเป็นช่อดอกไม้ ให้เริ่มสั่นดึงดูดสายตาทันที */
+                setTimeout(() => {
+                    plantImg.classList.add('wobble-active');
+                }, 50);
+
+                nongImg.style.display = 'none'; 
                 
                 setTimeout(() => {
-                    seed.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random() * 20 - 10}deg)`;
-                }, idx * 100);
-                
-                seed.onclick = () => openPhoto(`photo${idx + 1}.jpg`, cap);
-            });
+                    isBouquetStage = true;
+                    statusText.innerText = `ดอกไม้สำหรับที่รัก💗\nลองกดที่ช่อดอกไม้สิ!`;
+                    
+                    plantImg.style.cursor = 'pointer';
+                    plantImg.onclick = () => {
+                        bgMusic.play().catch(e => console.log("Music play blocked"));
+                        /* แก้ไข: พอกดรูปเด้งออกมา ช่อดอกไม้จะหยุดสั่นทันที */
+                        plantImg.classList.remove('wobble-active');
+                        plantImg.style.transform = "scale(1.15) rotate(0deg)";
+                        explode();
+                    };
+                }, 100);
+            }
+        };
 
+        function explode() {
+            statusText.style.opacity = "0";
+            plantContainer.onclick = null;
+
+            const positions = [
+                {x: -110, y: -140}, {x: 0, y: -150}, {x: 110, y: -140},
+                {x: -120, y: -50},                   {x: 120, y: -50}, 
+                {x: -120, y: 40},                    {x: 120, y: 40},  
+                {x: -110, y: 130},  {x: 0, y: 150},  {x: 110, y: 130}, 
+                {x: 0, y: -40}                                         
+            ];
+
+            for (let i = positions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [positions[i], positions[j]] = [positions[j], positions[i]];
+            }
+
+            for (let i = 0; i < 10; i++) {
+                const img = document.createElement('img');
+                img.src = `photo${i+1}.jpg`;
+                img.className = 'memory-seed';
+                img.onerror = function() { this.src = 'https://via.placeholder.com/60'; };
+                img.onclick = (e) => { e.stopPropagation(); showPhoto(img, img.src, captions[i]); };
+                document.body.appendChild(img);
+                
+                const pos = positions[i];
+                const jitterX = (Math.random() - 0.5) * 20;
+                const jitterY = (Math.random() - 0.5) * 20;
+                const finalX = pos.x + jitterX;
+                const finalY = pos.y + jitterY;
+                
+                /* แก้ไข: สุ่มมุมเอียงรูปภาพให้ดูมีความเป็นธรรมชาติติดเอียงเล็กน้อย ไม่อยู่ในระเบียบ */
+                const rotate = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 18);
+
+                setTimeout(() => {
+                    img.style.left = `calc(50% + ${finalX}px)`;
+                    img.style.top = `calc(50% + ${finalY}px)`;
+                    img.style.transform = `translate(-50%, -50%) rotate(${rotate}deg) scale(1)`;
+                }, i * 60);
+            }
+
+            const boxPos = positions[10];
+            const boxJitterX = (Math.random() - 0.5) * 15;
+            const boxJitterY = (Math.random() - 0.5) * 15;
+            const boxFinalX = boxPos.x + boxJitterX;
+            const boxFinalY = boxPos.y + boxJitterY;
+            const boxRotate = (Math.random() - 0.5) * 25;
+
+            boxBtn.style.display = "block";
             setTimeout(() => {
-                boxBtn.style.display = 'block';
-                setTimeout(() => {
-                    boxBtn.style.transform = 'translate(-50%, -50%) scale(1)';
-                }, 10);
-            }, captions.length * 100 + 500);
-        });
+                boxBtn.style.left = `calc(50% + ${boxFinalX}px)`;
+                boxBtn.style.top = `calc(50% + ${boxFinalY}px)`;
+                boxBtn.style.transform = `translate(-50%, -50%) rotate(${boxRotate}deg) scale(1)`;
+            }, 100);
+        }
 
-        function openPhoto(src, caption) {
+        let currentOriginElement = null;
+        let emojiInterval = null;
+
+        /* แก้ไข: อิโมจิตอนเปิดรูป/ข้อความ ให้ลอยกระจายทั่วหน้าจอ ไม่รวมตรงกลาง และลอยขึ้นมาช้าๆ */
+        function startEmojiBurst() {
+            const container = document.getElementById('photo-viewer').style.display === 'flex' ? 
+                document.getElementById('photo-viewer') : document.getElementById('overlay');
+            
+            const emojis = ['🌻','💗'];
+            
+            function spawn() {
+                const el = document.createElement('div');
+                el.className = 'pop-emoji';
+                el.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                el.style.left = (Math.random() * 90 + 5) + 'vw';
+                el.style.setProperty('--x-move', ((Math.random() - 0.5) * 120) + 'px');
+                container.appendChild(el);
+                setTimeout(() => el.remove(), 5000);
+            }
+            
+            for(let i=0; i<5; i++) setTimeout(spawn, Math.random() * 600);
+            emojiInterval = setInterval(spawn, 600);
+        }
+
+        function stopEmojiBurst() {
+            if(emojiInterval) clearInterval(emojiInterval);
+        }
+
+        function showPhoto(element, src, text) {
+            currentOriginElement = element;
             const viewer = document.getElementById('photo-viewer');
+            const card = document.getElementById('active-view-card');
+            
             document.getElementById('view-img').src = src;
-            document.getElementById('view-caption').innerText = caption;
+            document.getElementById('view-caption').innerText = text;
+            
+            const rect = element.getBoundingClientRect();
+            const startLeft = rect.left + (rect.width / 2);
+            const startTop = rect.top + (rect.height / 2);
+            
+            card.style.transition = 'none';
+            card.style.left = startLeft + 'px';
+            card.style.top = startTop + 'px';
+            card.style.transform = 'translate(-50%, -50%) scale(0.1)';
+            card.style.opacity = '0';
+            
             viewer.style.display = 'flex';
-            setTimeout(() => viewer.style.backgroundColor = 'rgba(0,0,0,0.6)', 10);
+            
+            setTimeout(() => {
+                viewer.style.backgroundColor = 'rgba(0,0,0,0.85)';
+                card.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                card.style.left = '50%';
+                card.style.top = '50%';
+                card.style.transform = 'translate(-50%, -50%) scale(1)';
+                card.style.opacity = '1';
+                startEmojiBurst();
+            }, 20);
         }
 
         function closePhoto() {
+            stopEmojiBurst();
             const viewer = document.getElementById('photo-viewer');
-            viewer.style.backgroundColor = 'rgba(0,0,0,0)';
-            setTimeout(() => viewer.style.display = 'none', 300);
+            const card = document.getElementById('active-view-card');
+            
+            if (currentOriginElement) {
+                const rect = currentOriginElement.getBoundingClientRect();
+                const endLeft = rect.left + (rect.width / 2);
+                const endTop = rect.top + (rect.height / 2);
+                
+                viewer.style.backgroundColor = 'rgba(0,0,0,0)';
+                card.style.left = endLeft + 'px';
+                card.style.top = endTop + 'px';
+                card.style.transform = 'translate(-50%, -50%) scale(0.1)';
+                card.style.opacity = '0';
+                
+                setTimeout(() => {
+                    viewer.style.display = 'none';
+                }, 500);
+            } else {
+                viewer.style.display = 'none';
+            }
         }
 
-        function openNote(el) {
+        function openNote(element) {
+            currentOriginElement = element;
             const overlay = document.getElementById('overlay');
+            const noteDisplay = document.getElementById('note-img-display');
+            
+            const rect = element.getBoundingClientRect();
+            const startLeft = rect.left + (rect.width / 2);
+            const startTop = rect.top + (rect.height / 2);
+            
+            noteDisplay.style.transition = 'none';
+            noteDisplay.style.left = startLeft + 'px';
+            noteDisplay.style.top = startTop + 'px';
+            noteDisplay.style.transform = 'translate(-50%, -50%) scale(0.1)';
+            noteDisplay.style.opacity = '0';
+            
             overlay.style.display = 'flex';
-            setTimeout(() => overlay.style.backgroundColor = 'rgba(0,0,0,0.7)', 10);
+            
+            setTimeout(() => {
+                overlay.style.backgroundColor = 'rgba(0,0,0,0.9)';
+                noteDisplay.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                noteDisplay.style.left = '50%';
+                noteDisplay.style.top = '50%';
+                noteDisplay.style.transform = 'translate(-50%, -50%) scale(1)';
+                noteDisplay.style.opacity = '1';
+                startEmojiBurst();
+            }, 20);
         }
 
         function closeNote() {
+            stopEmojiBurst();
             const overlay = document.getElementById('overlay');
-            overlay.style.backgroundColor = 'rgba(0,0,0,0)';
-            setTimeout(() => overlay.style.display = 'none', 300);
+            const noteDisplay = document.getElementById('note-img-display');
+            
+            if (currentOriginElement) {
+                const rect = currentOriginElement.getBoundingClientRect();
+                const endLeft = rect.left + (rect.width / 2);
+                const endTop = rect.top + (rect.height / 2);
+                
+                overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+                noteDisplay.style.left = endLeft + 'px';
+                noteDisplay.style.top = endTop + 'px';
+                noteDisplay.style.transform = 'translate(-50%, -50%) scale(0.1)';
+                noteDisplay.style.opacity = '0';
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+            } else {
+                overlay.style.display = 'none';
+            }
         }
     </script>
 </body>
